@@ -30,6 +30,22 @@ app.post('/products', async (req, res, next) => {
     }
 });
 
+app.get('/products', async (req, res, next) => {
+    try {
+        const products = await prisma.product.findMany();
+        return res.status(200).json({
+            success: true,
+            data: products
+        });
+    } catch (error) {
+        console.error("Error getting products:", error);
+        return res.status(500).json({
+            success: false,
+            message: "error fetching products"
+        });
+    }
+});
+
 const saveProduct = async (productValue) => {
     try {
         const productSaved = await prisma.product.create({
