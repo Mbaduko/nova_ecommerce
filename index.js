@@ -46,6 +46,30 @@ app.get('/products', async (req, res, next) => {
     }
 });
 
+app.put('/products/:id', async (req, res, next) => {
+    try {
+        const id = parseInt(req.params.id);
+        const updates = req.body;
+
+
+        const updatedProduct = await prisma.product.update({
+            where: { id },
+            data: updates
+        });
+
+        return res.status(200).json({
+            success: true,
+            data: updatedProduct
+        });
+    } catch (error) {
+        console.error("Error updating product;", error);
+        return res.status(500).json({
+            success: false,
+            message: "error updating product"
+        });
+    };
+});
+
 const saveProduct = async (productValue) => {
     try {
         const productSaved = await prisma.product.create({
