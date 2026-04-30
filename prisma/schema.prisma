@@ -12,3 +12,10 @@ model Product {
   name String
   price Float
 }
+
+model User {
+  id Int @id @default(autoincrement())
+  name String
+  email String @unique
+  password String
+}
