@@ -1,7 +1,7 @@
 import express from 'express';
 import dotenv from 'dotenv';
 import {saveProduct, getProducts, updateProduct} from './src/controllers/productControllers.js'
-import {createUser} from './src/controllers/userControllers.js'
+import {createUser, login} from './src/controllers/userControllers.js'
 import {prisma} from './src/config/prisma.js';
 
 dotenv.config();
@@ -18,6 +18,8 @@ app.get('/products', getProducts);
 app.put('/products/:id', updateProduct);
 
 app.post('/users', createUser);
+
+app.post('/login', login);
 
 
 app.listen(PORT, async () => {
