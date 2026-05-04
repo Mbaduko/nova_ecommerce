@@ -1,5 +1,9 @@
 import { prisma } from "../config/prisma.js";
 import argon2 from "argon2";
+import jwt from 'jsonwebtoken';
+import dotenv from "dotenv";
+
+dotenv.config();
 
 
 export const createUser = async (req, res,next) => {
@@ -46,10 +50,20 @@ export const login = async (req, res, next) => {
         const isPasswordRight = await argon2.verify(user.password, password);
         if (isPasswordRight) {
             const {password, ...userInfo} = user;
+            const token = jwt.sign({
+                    usrId: user.id,
+                    email: user.email
+                },
+                process.env.JWT_KEY,
+                {
+                    expiresIn: "1d"
+                }
+            );
             return res.status(200).json ({
                 success: true,
                 message: "Login successful",
-                data: user
+                token,
+                data: userInfo
             });
         }
 

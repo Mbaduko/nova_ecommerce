@@ -1,9 +1,8 @@
 import {prisma} from "../config/prisma.js";
 
 export const saveProduct = async (req, res, next) => {
-    try {
+    try{
         const inputs = req.body;
-        console.log(inputs);
         const result = await prisma.product.create({
             data: inputs
         })
