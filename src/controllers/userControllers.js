@@ -2,9 +2,9 @@ import { prisma } from "../config/prisma.js";
 import argon2 from "argon2";
 import jwt from 'jsonwebtoken';
 import dotenv from "dotenv";
+import * as z from "zod";
 
 dotenv.config();
-
 
 export const createUser = async (req, res,next) => {
     try {
@@ -33,6 +33,25 @@ export const createUser = async (req, res,next) => {
 
 export const login = async (req, res, next) => {
     try {
+
+        const logingSchema= z.object({
+            email: z.string(
+                'Invalid email address'
+            ).email('Use email format'),
+            password:z.string('Invalid passwor<d').min(8,'Password must be at least 8 characters long')
+        });
+
+        const result = logingSchema.safeParse(req.body);
+        
+        if (!result.success) {
+            return res.status(400).json({
+                success: false,
+                message: "Invalid input", 
+                errors: result.error
+            });
+        };
+
+
         const {email,password} = req.body;
         
         const user = await prisma.user.findUnique({
