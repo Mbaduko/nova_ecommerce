@@ -7,10 +7,19 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+
+enum OrderStatus {
+  PENDING
+  DELIVERED
+  CANCELED
+}
 model Product {
   id Int @id @default(autoincrement())
   name String
+  quantity Int @default(0)
   price Float
+
+  orders OderedProduct[]
 }
 
 model User {
@@ -18,4 +27,27 @@ model User {
   name String
   email String @unique
   password String
+
+  orders Order[]
+}
+
+model Order {
+  id Int @id @default(autoincrement())
+  userId Int
+  status OrderStatus @default(PENDING)
+  totalPrice Float
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id])
+  products OderedProduct[]
+}
+
+model OderedProduct {
+  id Int @id @default(autoincrement())
+  orderId Int
+  productId Int
+  quantity Int
+
+  order Order @relation(fields: [orderId], references: [id])
+  product Product @relation(fields: [productId], references: [id])
 }
