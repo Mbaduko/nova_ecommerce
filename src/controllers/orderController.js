@@ -101,3 +101,74 @@ export const createOrder = async (req, res, next) => {
         });
     }
 }
+
+export const cancelOrder = async (req, res) => {
+    try {
+
+        const orderId = parseInt(req.params.id);
+        const userId = parseInt(req.user.userId);
+
+        console.log("User:", req.user);
+        
+        const order = await prisma.order.findUnique({
+            where: {
+                id: orderId
+            }
+        });
+
+        if (!order) {
+            return res.status(404).json({
+                success:false,
+                message: "Order not found"
+            });
+        }
+
+        if (order.status !== 'PENDING')
+            return res.status(409).json({
+                success: false,
+                message: "Order is not pending"
+            });
+        
+        const user = await prisma.user.findUnique({
+            where: {
+                id: userId
+            }
+        });
+
+        if(!user) {
+            return res.status(404).json({
+                success: false,
+                message: "User not found"
+            });
+        }
+
+        if (order.userId !== userId) {
+            return res.status(403).json({
+                success: false,
+                message: "Order is not yours"
+            });
+        }
+
+        const canceledOrder = await prisma.order.update({
+            where: {
+                id: orderId
+            },
+            data:{
+                status: 'CANCELED'
+            }
+        });
+
+        return res.status(200).json({
+            success: true,
+            message: "Order canceled successfully",
+            data: canceledOrder
+        });
+
+    } catch (error) {
+        console.error("Error canceling order:", error);
+        return res.status(500).json ({
+            success: false,
+            message: "Internal server error"
+        })
+    }
+};

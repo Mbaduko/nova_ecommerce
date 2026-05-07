@@ -22,6 +22,7 @@ const protect = (req, res, next) => {
 
     try {
         const tokenPayload = jwt.verify(token,process.env.JWT_KEY);
+        req.user = tokenPayload;
         return next();
     } catch (error) {
         console.error(error);
@@ -29,6 +30,18 @@ const protect = (req, res, next) => {
             success: false,
             message: "Invalid token"
         });
+    }
+}
+
+export const grantAccess = (role) => {
+    return (req, res, next) => {
+        if (req.user.role !== role)
+            return res.status(403).json({
+                success: false,
+                message: "Access denied you don't enough previleges"
+            });
+
+        return next();
     }
 }
 

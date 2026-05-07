@@ -3,6 +3,7 @@ import argon2 from "argon2";
 import jwt from 'jsonwebtoken';
 import dotenv from "dotenv";
 import * as z from "zod";
+import { UserRole } from "@prisma/client";
 
 dotenv.config();
 
@@ -70,8 +71,9 @@ export const login = async (req, res, next) => {
         if (isPasswordRight) {
             const {password, ...userInfo} = user;
             const token = jwt.sign({
-                    usrId: user.id,
-                    email: user.email
+                    userId: user.id,
+                    email: user.email,
+                    role: user.role
                 },
                 process.env.JWT_KEY,
                 {

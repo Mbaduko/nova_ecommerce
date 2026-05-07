@@ -3,8 +3,8 @@ import dotenv from 'dotenv';
 import {saveProduct, getProducts, updateProduct} from './src/controllers/productControllers.js'
 import {createUser, login} from './src/controllers/userControllers.js'
 import {prisma} from './src/config/prisma.js';
-import protect from './src/middlewares/auth.js';
-import { createOrder } from './src/controllers/orderController.js';
+import protect, {grantAccess} from './src/middlewares/auth.js';
+import { cancelOrder, createOrder } from './src/controllers/orderController.js';
 
 dotenv.config();
 
@@ -13,17 +13,18 @@ const app = express()
 const PORT = process.env.PORT|| 3000;
 app.use(express.json());
 
-app.post('/products', protect, saveProduct);
+app.post('/products', protect, grantAccess('ADMIN'), saveProduct);
 
 app.get('/products', getProducts);
-``
+
 app.put('/products/:id', updateProduct);
 
 app.post('/users', createUser);
 
 app.post('/login', login);
 
-app.post('/orders', protect, createOrder);
+app.post('/orders', protect, grantAccess('CUSTOMER'), createOrder);
+app.put('/orders/:id/cancel', protect, cancelOrder);
 
 
 app.listen(PORT, async () => {

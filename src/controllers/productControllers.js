@@ -58,7 +58,3 @@ export const updateProduct = async (req, res, next) => {
         });
     };
 }
-
-// module.exports = {
-//     saveProduct
-// }
